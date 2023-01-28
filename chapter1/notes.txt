@@ -1,0 +1,18 @@
+ctrl+h - backspace
+ctrl+d - no more input
+ctrl+i - tab
+ctrl+m - return
+ctrl+g - ring bell
+ctrl+c - delete = stop the running program!
+
+
+login - log into the system (e.g. ssh)
+date - print date
+who - print info about who is logged in (on tty?)
+mail - read mail (obsolate?)
+
+tty = teletype - archaic name for terminal
+
+whoami - print info about me
+
+
