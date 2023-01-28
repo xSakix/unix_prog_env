@@ -82,7 +82,7 @@ int main(int argc, char *argv[]){
 
         nowtime = data->ut_tv.tv_sec;
         strftime(tmbuf, sizeof(tmbuf), "%Y-%m-%d %H:%M",localtime(&nowtime));
-        sprintf(result, "%s\t%s\t%s (%s)\n", data->ut_user, data->ut_host, tmbuf, data->ut_host);
+        sprintf(result, "%s\t%s\t%s (%s)\n", data->ut_user, data->ut_line, tmbuf, data->ut_host);
         printf("%s",result);
         
     }
