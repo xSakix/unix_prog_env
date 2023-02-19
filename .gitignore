@@ -2,6 +2,7 @@
 !.gitignore
 !**.c
 !**.h
+!**.md
 !Makefile
 !chapter1
 !chapter2
