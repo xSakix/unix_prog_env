@@ -197,3 +197,197 @@ grep marry <tmp
 
 ## Pipes
 
+A pipe is a way to connect the output of one program to the input of another program without any temporary file. A pipeline is a connection of two or mor eprograms through pipes.
+
+**<u>Example rewritten:</u>**
+```
+who | sort
+who | wc -l
+ls | wc -l
+ls | pr -3
+who | grep marry 
+```
+
+* any program that reads from the terminal can read from a pipe
+* any program that writes on the termnial can write to a pipe
+
+```
+ls | pr -3 | lpr
+who | grep marry | wc -l
+```
+
+### How the programs in a pipeline are run
+
+* Programs in a pipeline run at the same time, **not one after another**.
+* Programs in a pipeline can be interactive.
+* **Kernel** looks after whatever **scheduling** and **synchronization** is needed to make it all work.
+
+### How are commands in shell invoked
+
+* Normal command invocation looks like this: *command optional-arguments optional-filenames*
+* If no filename, command **reads from standard input**
+* Standard input is by **default the terminal**
+* Standard input can be **redirected** to come form a **file** or a **pipe**.
+* Most commands write their outputs on **standard output**.
+* Standard output is by **default send to the terminal**.
+* Standard output can be redirected to a **file** or a **pipe**.
+* Each command has a **standard error** output as well.
+* **Standard error is normally directed to the terminal**.
+
+## Processes
+
+* You can two programs by separating them with ';'. Ex.: 
+  ```
+  $ date;who
+  ```
+* Commands are run in sequence
+* '&' at the end of a command line says to the shell "start this command running, then take further commands from the terminal immediately", e.g. don't wait for it to complete. If we redirect into file, it will not interfere with whatever we do.
+  
+  ```
+  $ c Readme.md > wc.out &
+  [1] 6252
+  [1]+  Done                    wc Readme.md > wc.out
+  ```
+
+* **An instance of a running program is called a <u>process</u>**
+* Each process has a **process id**. We can use it refer to a specific running program.
+* **wc** is a program. Each time we run **wc** we create a new **process**.
+* '&' applies to the <u>whole</u> pipeline. All programs are started at the same time in pipeline. Printed process id will belong to the last program/process in the sequence.
+
+```
+$ cat Readme.md | wc &
+[1] 7634
+    256    1431    7790
+[1]+  Done                    cat Readme.md | wc
+```
+
+* **wait** - wait's for all processes initiated with '&' to finish. It will block until that happens.
+
+```
+$ cat Readme.md | wc ; sleep 10 &
+    263    1489    8134
+[1] 7764
+$ wait
+[1]+  Done                    sleep 10
+````
+
+* **kill <process id>** - stop process. **kill 0** - kills all processes except for login shell.
+
+```
+$ cat Readme.md | wc ; sleep 10 &
+    271    1514    8262
+[1] 7847
+$ kill 7847
+[1]+  Terminated              sleep 10
+```
+
+* **ps -ag** - print all currently running processes. Output is different on each system.
+
+```
+PID TTY      STAT   TIME COMMAND
+   1789 tty2     Ssl+   0:00 /usr/libexec/gdm-wayland-session /usr/bin/gnome-session
+   1798 tty2     Sl+    0:00 /usr/libexec/gnome-session-binary
+   2826 pts/0    Ss     0:00 bash
+   8104 pts/0    R+     0:00 ps -ag
+```
+
+* **PID** - process id
+* **TTY** - terminal asociated with the process
+* **TIME** - processor time used in minutes and seconds
+* **COMMAND** - command being run
+* **STAT** - is not mentioned, but quick man lookup returns - state of the process (D uninterruptible sleep, I idle kernel thread, R running or runnable, S interruptible sleep, T stopped by job control signal, t stopped by debugged, W paging, X dead, Z defunct zombie process). For BSD style < high priority, N low priority, L has pages locked into mem, s is session leader, l is multi-threaded, + is in the foregroung process gr
+  
+* Processes are ordered into a hierarchy like filesystem. **Each process has a parent**. Each process can have **children**. 
+* My shell was created by a process connected to system. Each command I run will be a direct child of my shell.
+* If we run a command from within our commands, the command will be a child of that one, and a grandchild of the shell.
+
+* **nohup** - no hang up. The command will continue to run if you log out. Output is saved into a file 'nohup.out'. There is no way to nohup a command retroactively.
+
+```
+nohup command &
+```
+
+* **nice _expensive command_ &** - run your command with lower priority. Use for commands which run long time and can affect other users on the system. **nohup runs automatically nice also!**
+* **at _time_</i>_** - start command at given time. **atq** - print scheduled jobs. **atrm _job num_** - removes scheduled job with given job num. **batch** - run a command when resources permit it (.e.g. the load drops bellow 0.8)
+
+```
+$ at 12:57
+warning: commands will be executed using /bin/sh
+at Sat Apr  1 12:57:00 2023
+at> ls -la
+at> <EOT>
+job 1 at Sat Apr  1 12:57:00 2023
+```
+
+## Tailoring the environment
+
+* **.profile** - the shell will execute commands when you log in, before printing the first prompt. It is used to setup your environment.
+* **stty erase <backspace>** - one of the first command in _.profile_. For backspace you can enter '^x' for ctrl+x, or '^h' for backspace. **^** - is an obsolate symbol for pipe operator '|' and therefore it must be protected by quotes.
+* **stty erase '^h' -tabs** - add sensible tab stops to terminal
+* **who | wc -l** - see how busy the system is
+* **.bashr** - is the main profile file for bash which runs on each new terminal bash shell
+
+### Some shell variables
+
+* **PS1** - sets the prompt string. For example if it is:
+
+```
+PS1='%'
+```
+Your shell prompt will literally start with '\%'.
+
+* when setting shell variables **spaces are not permitted** around '='
+
+```
+#this is ok:
+PS1='%'
+
+#this is not:
+PS1 = '%'
+```
+
+* **HOME** - name of our home directory
+* **MAIL** - standard files where our mail is kept
+* **PATH** - contains a sequence of directories which represent a _search path_, where the shell looks for commands. We set PATH usually like this:
+
+```
+PATH=$PATH:/my/dir/with/commands
+```
+
+This will add to existing PATH (defined here as $PATH) a new directory where our commands are.
+
+* you can use **echo** to print shell variables:
+
+```
+[martin@fedora ~]$ echo $PS1
+[\u@\h \W]\$
+[martin@fedora ~]$ echo $PATH
+/home/martin/.local/bin:/home/martin/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin
+[martin@fedora ~]$ echo $HOME
+/home/martin
+```
+
+* **TERM** - defines the kind of terminal we want.This info may make it possible for programs to manage your screen more effectively.
+
+```
+[martin@fedora ~]$ echo $TERM
+xterm-256color
+```
+
+* you can use variables for abbreviation. For example define a shorcut for a long directory path
+
+```
+d=/horribly/long/directory/name
+
+#and use in shell like this:
+
+$cd $d
+```
+
+* personal variables should be spelled **in lower case**
+* **export** is used to mark variables to be used in other commands
+
+```
+export MAIL PATH TERM
+```
+
