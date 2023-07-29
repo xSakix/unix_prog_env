@@ -359,18 +359,18 @@ This will add to existing PATH (defined here as $PATH) a new directory where our
 * you can use **echo** to print shell variables:
 
 ```
-[martin@fedora ~]$ echo $PS1
+$ echo $PS1
 [\u@\h \W]\$
-[martin@fedora ~]$ echo $PATH
+$ echo $PATH
 /home/martin/.local/bin:/home/martin/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin
-[martin@fedora ~]$ echo $HOME
+$ echo $HOME
 /home/martin
 ```
 
 * **TERM** - defines the kind of terminal we want.This info may make it possible for programs to manage your screen more effectively.
 
 ```
-[martin@fedora ~]$ echo $TERM
+$ echo $TERM
 xterm-256color
 ```
 
