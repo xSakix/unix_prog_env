@@ -236,7 +236,7 @@ who | grep marry | wc -l
 
 ## Processes
 
-* You can two programs by separating them with ';'. Ex.: 
+* You can run two programs by separating them with ';'. Ex.: 
   ```
   $ date;who
   ```
